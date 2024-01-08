@@ -69,10 +69,38 @@ class SpinText {
             $parts = explode('|', $matches[1]);
             return esc_html($parts[array_rand($parts)]); // Экранирование для безопасности
         } elseif (!empty($matches[2])) {
-            $parts = explode('|', $matches[2]);
-            shuffle($parts);
-            return implode('', array_map('esc_html', $parts)); // Экранирование каждого элемента
+            $parts = $this->permutate(explode('|', $matches[2]));
+            return implode(' ', array_map('esc_html', $parts)); // Экранирование каждого элемента и объединение с пробелом
         }
+    }
+
+    // Функция для перестановок
+    private function permutate($array) {
+        $result = array();
+        $recurse = function($array, $start_i = 0) use (&$result, &$recurse) {
+            if ($start_i === count($array)-1) {
+                array_push($result, $array);
+            }
+
+            for ($i = $start_i; $i < count($array); $i++) {
+                // Меняем элементы местами
+                $temp = $array[$i];
+                $array[$i] = $array[$start_i];
+                $array[$start_i] = $temp;
+
+                // Рекурсивный вызов
+                $recurse($array, $start_i + 1);
+
+                // Возвращаем элементы обратно
+                $array[$start_i] = $array[$i];
+                $array[$i] = $temp;
+            }
+        };
+
+        $recurse($array);
+
+        // Возвращаем случайный вариант перестановки
+        return $result[array_rand($result)];
     }
 
     function transient_key( $text ) {
@@ -80,3 +108,4 @@ class SpinText {
         return sprintf( self::TRANSIENT_KEY_FORMAT, $key );
     }
 }
+
