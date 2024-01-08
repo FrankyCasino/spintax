@@ -59,53 +59,38 @@ class SpinText {
     private function do_spin( $text ) {
         return preg_replace_callback(
             '/\{([^{}]*)\}|\[([^[\]]*)\]/',
-            array( $this, 'replace' ),
+            array( $this, 'spin_callback' ),
             $text
         );
     }
 
-    private function replace( $matches ) {
+    private function spin_callback( $matches ) {
         if (!empty($matches[1])) {
-            $parts = explode('|', $matches[1]);
-            return esc_html($parts[array_rand($parts)]); // Экранирование для безопасности
+            return $this->spin_select($matches[1]);
         } elseif (!empty($matches[2])) {
-            $parts = $this->permutate(explode('|', $matches[2]));
-            return implode(' ', array_map('esc_html', $parts)); // Экранирование каждого элемента и объединение с пробелом
+            return $this->spin_permutate($matches[2]);
         }
     }
 
-    // Функция для перестановок
-    private function permutate($array) {
-        $result = array();
-        $recurse = function($array, $start_i = 0) use (&$result, &$recurse) {
-            if ($start_i === count($array)-1) {
-                array_push($result, $array);
-            }
-
-            for ($i = $start_i; $i < count($array); $i++) {
-                // Меняем элементы местами
-                $temp = $array[$i];
-                $array[$i] = $array[$start_i];
-                $array[$start_i] = $temp;
-
-                // Рекурсивный вызов
-                $recurse($array, $start_i + 1);
-
-                // Возвращаем элементы обратно
-                $array[$start_i] = $array[$i];
-                $array[$i] = $temp;
-            }
-        };
-
-        $recurse($array);
-
-        // Возвращаем случайный вариант перестановки
-        return $result[array_rand($result)];
+    private function spin_select( $text ) {
+        $parts = explode('|', $text);
+        foreach ($parts as $key => $part) {
+            $parts[$key] = $this->spin($part);
+        }
+        return $parts[array_rand($parts)];
     }
 
-    function transient_key( $text ) {
+    private function spin_permutate( $text ) {
+        $parts = explode('|', $text);
+        foreach ($parts as $key => $part) {
+            $parts[$key] = $this->spin($part);
+        }
+        shuffle($parts);
+        return implode(' ', $parts);
+    }
+
+    private function transient_key( $text ) {
         $key = md5($text);
         return sprintf( self::TRANSIENT_KEY_FORMAT, $key );
     }
 }
-
