@@ -12,8 +12,8 @@ Spintax is a dynamic content generation plugin for WordPress. It enables the cre
 - User-friendly Interface
 
 ## Installation
-1. Download the plugin files.
-2. Upload to your WordPress plugin directory.
+1. Download the plugin archive.
+2. Install using the Wordpress interface.
 3. Activate 'Spintax' from your Plugins page.
 
 ## Usage
@@ -21,21 +21,33 @@ To use Spintax, simply wrap your text with curly braces `{}` and separate the op
 
 ### Examples:
 
-**Basic Usage:**
-
-[spintax] {Option1|Option2|Option3} [/spintax]
-
+## Basic Usage
+**Description**: Randomly displays one of the provided options.
+```html
+[spintax]{Option1|Option2|Option3}[/spintax]
+```
 This will randomly display 'Option1', 'Option2', or 'Option3'.
 
 **Nested Spintax:**
-[spintax] {This is {an example|a sample}|Here is {another example|another sample}} of nested Spintax. [/spintax]
-
+```html
+[spintax]{This is {an example|a sample}|Here is {another example|another sample}} of nested Spintax.[/spintax]
+```
 Nested Spintax allows for more complex variations.
 
 **With Caching:**
+```html
 [spintax cache="3600"] {Cachable|Content} for one hour. [/spintax]
+```
+This example caches the output for 3600 seconds (1 hour). To disable caching (for example, during testing), set cache="0".
 
-This example caches the output for 3600 seconds (1 hour).
+**Using Permutations**
+
+Introduces elements in a random order, adding variety to the output.
+```html
+[spintax]{Option1|Option2} combined with [OptionA|OptionB].[/spintax]
+```
+This shortcode generates various combinations by permuting 'Option1' and 'Option2' with 'OptionA' and 'OptionB'.
+
 
 ### Styling
 You can style the output of Spintax like any other text in WordPress using CSS.
